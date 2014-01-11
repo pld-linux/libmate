@@ -82,35 +82,32 @@ Podstawowa biblioteka libmate oraz moduły matecomponent.
 Summary:	Headers for libmate
 Summary(pl.UTF-8):	Pliki nagłówkowe libmate
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	libcanberra-devel
-Requires:	libmatecomponent-devel >= 2.24.0
+Requires:	libmatecomponent-devel >= 1.1.0
 Requires:	mate-conf-devel >= 1.1.0
-Requires:	mate-vfs-devel >= 2.24.0
+Requires:	mate-vfs-devel >= 1.1.0
 Requires:	popt-devel >= 1.5
 
 %description devel
-MATE (GNU Network Object Model Environment) is a user-friendly set of
-GUI applications and desktop tools to be used in conjunction with a
-window manager for the X Window System. The libmate-devel package
-includes the libraries and include files that you will need to use
-libmate.
+This package includes the header files for libmate applications
+development.
 
 %description devel -l pl.UTF-8
 Pliki nagłówkowe potrzebne do kompilowania programów korzystających z
 libmate.
 
 %package static
-Summary:	Static libmate libraries
-Summary(pl.UTF-8):	Statyczne biblioteki libmate
+Summary:	Static libmate library
+Summary(pl.UTF-8):	Statyczna biblioteka libmate
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 
 %description static
-Static version of libmate libraries.
+Static version of libmate library.
 
 %description static -l pl.UTF-8
-Statyczna wersja bibliotek libmate.
+Statyczna wersja biblioteki libmate.
 
 %package apidocs
 Summary:	libmate API documentation
