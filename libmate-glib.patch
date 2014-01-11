@@ -1,0 +1,10 @@
+--- libmate-1.4.0/libmate/Makefile.am.orig	2014-01-10 22:44:49.478879324 +0100
++++ libmate-1.4.0/libmate/Makefile.am	2014-01-10 22:47:54.115538243 +0100
+@@ -17,7 +17,6 @@
+ 	-I$(srcdir)/.. \
+ 	$(WARN_CFLAGS) \
+ 	$(LIBMATE_CFLAGS) \
+-	-DG_DISABLE_DEPRECATED \
+ 	-DLIBMATE_PREFIX=\""$(prefix)"\" \
+ 	-DLIBMATE_LIBDIR=\""$(libdir)"\" \
+ 	-DLIBMATE_DATADIR=\""$(datadir)"\" \

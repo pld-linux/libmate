@@ -1,0 +1,136 @@
+--- libmate-1.4.0/libmate/mate-config.c.orig	2014-01-10 22:30:17.662249244 +0100
++++ libmate-1.4.0/libmate/mate-config.c	2014-01-10 22:42:24.765552066 +0100
+@@ -46,7 +46,6 @@
+ #endif
+ 
+ #define STRSIZE 4096
+-#define overflow (next == &CharBuffer[STRSIZE - 1])
+ 
+ enum {
+ 	FirstBrace,
+@@ -381,8 +380,7 @@ static TSecHeader* load(const char* file
+ 	FILE* f;
+ 	int state;
+ 	TSecHeader* SecHeader = NULL;
+-	char CharBuffer[STRSIZE];
+-	char* next = "";		/* Not needed */
++	GString *CharBuffer;
+ 	int c;
+ 
+ 	if ((f = g_fopen(file, "r")) == NULL)
+@@ -390,6 +388,7 @@ static TSecHeader* load(const char* file
+ 		return NULL;
+ 	}
+ 
++	CharBuffer = g_string_new_len(NULL, STRSIZE);
+ 	state = FirstBrace;
+ 
+ 	while ((c = getc_unlocked(f)) != EOF)
+@@ -403,16 +402,15 @@ static TSecHeader* load(const char* file
+ 		{
+ 			case OnSecHeader:
+ 
+-				if (c == ']' || overflow)
++				if (c == ']')
+ 				{
+-					*next = '\0';
+-					next = CharBuffer;
+-					SecHeader->section_name = g_strdup(CharBuffer);
++					SecHeader->section_name = g_strdup(CharBuffer->str);
++					CharBuffer = g_string_truncate(CharBuffer, 0);
+ 					state = IgnoreToEOL;
+ 				}
+ 				else
+ 				{
+-					*next++ = c;
++					CharBuffer = g_string_append_c(CharBuffer, c);
+ 				}
+ 
+ 				break;
+@@ -431,7 +429,7 @@ static TSecHeader* load(const char* file
+ 						state = KeyDef;
+ 					}
+ 
+-					next = CharBuffer;
++					CharBuffer = g_string_truncate(CharBuffer, 0);
+ 				}
+ 
+ 				break;
+@@ -463,7 +461,7 @@ static TSecHeader* load(const char* file
+ 					SecHeader->link = temp;
+ 					SecHeader->keys = NULL;
+ 					state = OnSecHeader;
+-					next = CharBuffer;
++					CharBuffer = g_string_truncate(CharBuffer, 0);
+ 
+ 					break;
+ 				}
+@@ -479,28 +477,27 @@ static TSecHeader* load(const char* file
+ 					break;
+ 				}
+ 
+-				if (c == '\n' || overflow)
++				if (c == '\n')
+ 				{ /* Abort Definition */
+-					next = CharBuffer;
++					CharBuffer = g_string_truncate(CharBuffer, 0);
+ 					state = KeyDef;
+ 					break;
+ 				}
+ 
+-				if (c == '=' || overflow)
++				if (c == '=')
+ 				{
+ 					TKeys* temp;
+ 
+ 					temp = SecHeader->keys;
+-					*next = '\0';
+ 					SecHeader->keys = (TKeys*) g_malloc(sizeof(TKeys));
+ 					SecHeader->keys->link = temp;
+-					SecHeader->keys->key_name = g_strdup(CharBuffer);
++					SecHeader->keys->key_name = g_strdup(CharBuffer->str);
+ 					state = KeyValue;
+-					next = CharBuffer;
++					CharBuffer = g_string_truncate(CharBuffer, 0);
+ 				}
+ 				else
+ 				{
+-					*next++ = c;
++					CharBuffer = g_string_append_c(CharBuffer, c);
+ 					state = KeyDefOnKey;
+ 				}
+ 
+@@ -508,16 +505,15 @@ static TSecHeader* load(const char* file
+ 
+ 		case KeyValue:
+ 
+-			if (overflow || c == '\n')
++			if (c == '\n')
+ 			{
+-				*next = '\0';
+-				SecHeader->keys->value = decode_string_and_dup(CharBuffer);
++				SecHeader->keys->value = decode_string_and_dup(CharBuffer->str);
+ 				state = c == '\n' ? KeyDef : IgnoreToEOL;
+-				next = CharBuffer;
++				CharBuffer = g_string_truncate(CharBuffer, 0);
+ 			}
+ 			else
+ 			{
+-				*next++ = c;
++				CharBuffer = g_string_append_c(CharBuffer, c);
+ 			}
+ 
+ 			break;
+@@ -527,10 +523,10 @@ static TSecHeader* load(const char* file
+ 
+ 	if (c == EOF && state == KeyValue)
+ 	{
+-		*next = '\0';
+-		SecHeader->keys->value = decode_string_and_dup(CharBuffer);
++		SecHeader->keys->value = decode_string_and_dup(CharBuffer->str);
+ 	}
+ 
++	g_string_free(CharBuffer, TRUE);
+ 	fclose (f);
+ 	return SecHeader;
+ }
