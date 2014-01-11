@@ -1,7 +1,8 @@
+# NOTE: this package is deprecated, meant for MATE <= 1.4 compatibility only
 #
 # Conditional build:
-%bcond_with	static_libs	# static library
 %bcond_with	esd		# EsounD support (obsolete)
+%bcond_with	static_libs	# static library
 #
 Summary:	MATE base library
 Summary(pl.UTF-8):	Podstawowa biblioteka MATE
